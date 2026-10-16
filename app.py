@@ -1,4 +1,83 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-# ═══════════════════════════════════════════════════════════════════
+#  KEEP-ALIVE / AUTO WEB OPENER (paste at the VERY TOP of app.py)
+# ═══════════════════════════════════════════════════════════════════
+#  Ye code har 1 minute me diye gaye URL ko open karega taaki
+#  hosting platform (Render / Replit / Railway etc.) ko sleep na kare.
+#  Bas niche WEB_URL me apna URL daal do. Baaki kuch nahi karna.
+# ═══════════════════════════════════════════════════════════════════
+
+import threading as _ka_threading
+import time as _ka_time
+import urllib.request as _ka_urllib
+import sys as _ka_sys
+
+# 🔗 YAHAN APNA WEB URL DAALO (http/https ke sath)
+WEB_URL = "https://sonnicglory.onrender.com"
+
+# ⏱️ Interval (seconds) — default 60 sec = 1 minute
+KEEPALIVE_INTERVAL = 60
+
+# Set to True agar aap chahte ho ki har open pe console me print ho
+KEEPALIVE_VERBOSE = True
+
+
+def _keepalive_loop():
+    """Har KEEPALIVE_INTERVAL sec me WEB_URL ko hit karta hai (daemon thread)."""
+    _ka_time.sleep(10)  # app ko boot hone ka time do
+    while True:
+        try:
+            req = _ka_urllib.Request(
+                WEB_URL,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (KeepAliveBot/1.0)",
+                    "Accept": "*/*",
+                    "Connection": "keep-alive",
+                },
+            )
+            with _ka_urllib.urlopen(req, timeout=20) as resp:
+                code = resp.getcode()
+            if KEEPALIVE_VERBOSE:
+                try:
+                    print(f"[KEEPALIVE] {_ka_time.strftime('%H:%M:%S')} -> {WEB_URL} [{code}]")
+                except Exception:
+                    pass
+        except Exception as e:
+            if KEEPALIVE_VERBOSE:
+                try:
+                    print(f"[KEEPALIVE] {_ka_time.strftime('%H:%M:%S')} -> fail: {e}")
+                except Exception:
+                    pass
+        _ka_time.sleep(KEEPALIVE_INTERVAL)
+
+
+def _start_keepalive():
+    t = _ka_threading.Thread(target=_keepalive_loop, name="KeepAliveThread", daemon=True)
+    t.start()
+    return t
+
+
+# Auto-start on import (app.py ke top pe paste karne se turant chalu ho jayega)
+if WEB_URL and WEB_URL.startswith(("http://", "https://")):
+    try:
+        _start_keepalive()
+        try:
+            print(f"[KEEPALIVE] Started — pinging {WEB_URL} every {KEEPALIVE_INTERVAL}s")
+        except Exception:
+            pass
+    except Exception as _e:
+        try:
+            print(f"[KEEPALIVE] start failed: {_e}")
+        except Exception:
+            pass
+else:
+    try:
+        print("[KEEPALIVE] WEB_URL not configured — skipping. Edit WEB_URL at top of app.py")
+    except Exception:
+        pass
+
+# ═══════════════════════════════════════════════════════════════════
+#  END OF KEEP-ALIVE BLOCK — baaki app.py code iske niche rahega
+# ═══════════════════════════════════════════════════════════════════
 # ═══════════════════════════════════════════════════════════════════
 #  TEAM RBC — Squad Bot (Create → Invite → Accept → PK → In-Game)
 # ═══════════════════════════════════════════════════════════════════
